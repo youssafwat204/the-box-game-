@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="game" width="400" height="500"></canvas>
+<script>
+let canvas=document.getElementById("game");
+let ctx=canvas.getContext("2d");
+
+let player={x:180,y:460,w:40,h:40,speed:6};
+let blocks=[];
+let score=0;
+let gameOver=false;
+
+document.addEventListener("keydown",e=>{
+if(e.key==="ArrowLeft"&&player.x>0)player.x-=player.speed;
+if(e.key==="ArrowRight"&&player.x+player.w<canvas.width)player.x+=player.speed;
+});
+
+function spawnBlock(){
+let size=20+Math.random()*30;
+blocks.push({x:Math.random()*(canvas.width-size),y:-size,w:size,h:size,speed:2+Math.random()*3});
+}
+
+function update(){
+if(gameOver)return;
+if(Math.random()<0.03)spawnBlock();
+blocks.forEach(b=>b.y+=b.speed);
+blocks.forEach(b=>{
+if(b.y>canvas.height){score++;b.y=-100;}
+if(player.x<b.x+b.w&&player.x+player.w>b.x&&player.y<b.y+b.h&&player.y+player.h>b.y){
+gameOver=true;
+}
+});
+}
+
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillRect(player.x,player.y,player.w,player.h);
+blocks.forEach(b=>ctx.fillRect(b.x,b.y,b.w,b.h));
+ctx.font="20px Arial";
+ctx.fillText("Score: "+score,10,25);
+if(gameOver){
+ctx.font="30px Arial";
+ctx.fillText("Game Over",120,250);
+}
+}
+
+function loop(){
+update();
+draw();
+requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
